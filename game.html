@@ -3,33 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Word queue</title>
+  <title>Responsive Dual Grids with Dynamic Queue</title>
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
   <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
     #app {
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      height: 100vh;
-      font-family: Arial, sans-serif;
+      padding: 20px;
+      box-sizing: border-box;
+      min-height: 100vh;
+    }
+    .game-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
     }
     .game-container {
       display: flex;
-      gap: 40px;
-      max-width: 1000px;
+      flex-direction: column;
+      align-items: center;
+      max-width: 100%;
     }
     .grid-container {
       display: flex;
       flex-direction: column;
       gap: 20px;
+      margin-top: 20px;
     }
     .grid {
       display: grid;
       gap: 5px;
+      grid-template-columns: repeat(5, 1fr);
     }
-    .grid-5x5 {
-      grid-template-columns: repeat(5, 80px);
-      grid-template-rows: repeat(5, 80px);
+    .grid-puzzle {
+      grid-template-rows: repeat(5, 1fr);
     }
     .cell {
       display: flex;
@@ -37,10 +51,11 @@
       align-items: center;
       font-size: 24px;
       border: 1px solid #ccc;
-      cursor: pointer;
       user-select: none;
-      width: 80px;
-      height: 80px;
+      aspect-ratio: 1 / 1;
+    }
+    .cell.clickable {
+      cursor: pointer;
     }
     .black {
       background-color: black;
@@ -52,7 +67,7 @@
       border: 3px solid lightgreen;
     }
     .lowercase {
-      color: rgb(196, 196, 196);
+      color: gray;
     }
     .theme-title {
       font-size: 24px;
@@ -63,54 +78,98 @@
       font-size: 28px;
     }
     .rules {
-      width: 250px;
+      width: 100%;
+      max-width: 600px;
       font-size: 14px;
-      line-height: 1.4;
+      line-height: 1.6;
+      margin-top: 40px;
     }
     .rules h3 {
       margin-top: 0;
       font-size: 18px;
+      text-align: center;
+    }
+    .grid-label {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      text-align: center;
+    }
+    @media (min-width: 768px) {
+      .game-wrapper {
+        flex-direction: row;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 40px;
+      }
+      .game-container {
+        flex-direction: row;
+        justify-content: center;
+        gap: 40px;
+      }
+      .grid {
+        grid-template-columns: repeat(5, 80px);
+      }
+      .grid-puzzle {
+        grid-template-rows: repeat(5, 80px);
+      }
+      .cell {
+        width: 80px;
+        height: 80px;
+      }
+      .rules {
+        width: 250px;
+        margin-top: 0;
+      }
     }
   </style>
 </head>
 <body>
   <div id="app">
-    <div class="game-container">
-      <div class="grid-container">
-        <h2 class="theme-title">Theme: <strong>Animals</strong></h2>
-        <div class="grid grid-5x5">
-          <div 
-            v-for="(char, index) in grid1Characters" 
-            :key="'grid1-' + index" 
-            class="cell" 
-            :class="{ 
-              black: char === '-', 
-              empty: char === ' ',
-              highlighted: lastClickedCell === 'grid1-' + index,
-              lowercase: char === char.toLowerCase() && char !== char.toUpperCase()
-            }"
-            @click="transferCharacter(index)"
-          >
-            {{ char !== '-' && char !== ' ' ? char.toUpperCase() : '' }}
+    <div class="game-wrapper">
+      <div class="game-container">
+        <div class="grid-container">
+          <h2 class="theme-title">Theme: <strong>Animals</strong></h2>
+          <div>
+            <div class="grid-label">Puzzle</div>
+            <div class="grid grid-puzzle">
+              <div 
+                v-for="(char, index) in grid1Characters" 
+                :key="'grid1-' + index" 
+                class="cell clickable" 
+                :class="{ 
+                  black: char === '-', 
+                  empty: char === ' ',
+                  highlighted: lastClickedCell === 'grid1-' + index,
+                  lowercase: char === char.toLowerCase() && char !== char.toUpperCase()
+                }"
+                @click="transferCharacter(index)"
+              >
+                {{ char !== '-' && char !== ' ' ? char.toUpperCase() : '' }}
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="grid grid-5x5">
-          <div 
-            v-for="(char, index) in grid2Characters" 
-            :key="'grid2-' + index" 
-            class="cell" 
-            :class="{ 
-              black: char === '-', 
-              empty: char === ' ',
-              highlighted: index === 0 || lastClickedCell === 'grid2-' + index
-            }"
-          >
-            {{ char !== '-' && char !== ' ' ? char : '' }}
+          <div>
+            <div class="grid-label">Queue</div>
+            <div class="grid">
+              <div 
+                v-for="(char, index) in grid2Characters" 
+                :key="'grid2-' + index" 
+                class="cell" 
+                :class="{ 
+                  black: char === '-', 
+                  empty: char === ' ',
+                  highlighted: index === 0
+                }"
+              >
+                {{ char !== '-' && char !== ' ' ? char : '' }}
+              </div>
+            </div>
           </div>
         </div>
       </div>
       <div class="rules">
-        <h3>Rules:</h3>
+        <h3>Game Rules:</h3>
         <ol>
           <li>The top grid represents the main puzzle area.</li>
           <li>The bottom grid contains available letters.</li>
