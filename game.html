@@ -181,22 +181,23 @@
   </div>
 
   <script>
+    const words = ["Crab", "dOg", "hOrse", "fIsh", "liON"];
+
+    const paddedCharacters = words
+        .map(word => word.padEnd(5, '-'))
+        .flatMap(word => word.split(''))
+        .map(char => char === char.toUpperCase() ? char.toLowerCase() : ' ');
+
     new Vue({
       el: '#app',
       data: {
-        grid1Characters: [
-            'c', ' ', ' ', ' ', '-',
-            'd', ' ', ' ', '-', '-',
-            ' ', 'o', ' ', ' ', 'e',
-            ' ', 'i', ' ', ' ', '-',
-            ' ', ' ', 'o', 'n', '-'
-          ],
-          grid2Characters: [
-            'F', 'R', 'S', 'O', 'A',
-            'S', 'H', 'G', 'R', 'B',
-            'L', 'H', 'I'
-          ],
-          clickOrder: [],
+        grid1Characters: paddedCharacters,
+        grid2Characters: [
+          'F', 'R', 'S', 'O', 'A',
+          'S', 'H', 'G', 'R', 'B',
+          'L', 'H', 'I'
+        ],
+        clickOrder: [],
         lastClickedCell: null
       },
       methods: {
