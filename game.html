@@ -67,7 +67,15 @@
       border: 3px solid lightgreen;
     }
     .lowercase {
-      color: gray;
+      color: rgb(192, 192, 192);
+    }
+    .right {
+      color: #49c649;
+      font-weight: bold;
+    }
+    .wrong {
+      color: #ff0000;
+      font-weight: bold;
     }
     .theme-title {
       font-size: 24px;
@@ -141,7 +149,9 @@
                   black: char === '-', 
                   empty: char === ' ',
                   highlighted: lastClickedCell === 'grid1-' + index,
-                  lowercase: char === char.toLowerCase() && char !== char.toUpperCase()
+                  lowercase: char === char.toLowerCase() && char !== char.toUpperCase(),
+                  right: isRight(index) && char !== '-',
+                  wrong: isWrong(index) && char !== '-'
                 }"
                 @click="transferCharacter(index)"
               >
@@ -181,7 +191,7 @@
   </div>
 
   <script>
-    const words = ["Crab", "dOg", "hOrse", "fIsh", "liON"];
+    const words = ["Crab", "Dog", "hOrsE", "fIsh", "liON"];
 
     const paddedCharacters = words
         .map(word => word.padEnd(5, '-'))
@@ -198,6 +208,7 @@
           'L', 'H', 'I'
         ],
         clickOrder: [],
+        rowCompleted: [0, 0, 0, 0, 0],
         lastClickedCell: null
       },
       methods: {
@@ -207,6 +218,7 @@
             this.clickOrder.push(index);
             this.$set(this.grid1Characters, index, transferredChar);
             this.lastClickedCell = 'grid1-' + index;
+            this.checkRowCompletion(index);
           } else if (this.clickOrder.length > 0) {
             const lastClickIndex = this.clickOrder[this.clickOrder.length - 1];
             if (lastClickIndex === index) {
@@ -221,7 +233,31 @@
                 this.lastClickedCell = null;
               }
             }
+            this.checkRowCompletion(index);
           }
+        },
+        checkRowCompletion(index) {
+          const row = Math.floor(index / 5);
+          const row_start = row * 5;
+          const characters = this.grid1Characters.slice(row_start, row_start + 5);
+          if (characters.every(char => char !== ' ')) {
+            const word = characters.filter(char => char !== '-').join('');
+            if (word.toLowerCase() == words[row].toLowerCase()) {
+              this.$set(this.rowCompleted, row, 1);
+            } else {
+              this.$set(this.rowCompleted, row, -1);
+            }
+          } else {
+            this.$set(this.rowCompleted, row, 0);
+          }
+        },
+        isRight(index) {
+          const row = Math.floor(index / 5);
+          return this.rowCompleted[row] === 1;
+        },
+        isWrong(index) {
+          const row = Math.floor(index / 5);
+          return this.rowCompleted[row] === -1;
         }
       }
     });
