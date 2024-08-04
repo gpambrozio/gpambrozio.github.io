@@ -86,6 +86,13 @@
     .theme-title strong {
       font-size: 28px;
     }
+    .theme-selector {
+      margin-bottom: 20px;
+    }
+    .theme-selector select {
+      font-size: 22px;
+      padding: 5px 10px;
+    }
     .rules {
       width: 100%;
       max-width: 600px;
@@ -138,7 +145,12 @@
     <div class="game-wrapper">
       <div class="game-container">
         <div class="grid-container">
-          <h2 class="theme-title">Theme: <strong>Animals</strong></h2>
+          <div class="theme-selector theme-title">
+            <label for="theme-select">Theme: </label>
+            <select id="theme-select" v-model="selectedTheme" @change="changeTheme">
+              <option v-for="theme in themes" :value="theme.name">{{ theme.name }}</option>
+            </select>
+          </div>
           <div>
             <div class="grid-label">Puzzle</div>
             <div class="grid grid-puzzle">
@@ -192,22 +204,30 @@
   </div>
 
   <script>
-    const words = ["Crab", "Dog", "hOrsE", "fIsh", "liON"];
-
-    const paddedCharacters = words
-        .map(word => word.padEnd(5, '-'))
-        .flatMap(word => word.split(''))
-        .map(char => char === char.toUpperCase() ? char.toLowerCase() : ' ');
-
     new Vue({
       el: '#app',
       data: {
-        grid1Characters: paddedCharacters,
-        grid2Characters: [
-          'F', 'R', 'S', 'O', 'A',
-          'S', 'H', 'G', 'R', 'B',
-          'L', 'H', 'I'
+        selectedTheme: 'Animals',
+        themes: [
+          {
+            name: 'Animals',
+            words: ['Crab', 'Dog', 'hOrsE', 'fIsh', 'liON'],
+            letters: ['F', 'R', 'S', 'O', 'A', 'S', 'H', 'G', 'R', 'B', 'L', 'H', 'I']
+          },
+          {
+            name: 'Fruits',
+            words: ['ApplE', 'pEar', 'gRaPe', 'mAngo', 'pluM'],
+            letters: ['P', 'P', 'A', 'U', 'M', 'E', 'O', 'R', 'G', 'G', 'L', 'P', 'N', 'P', 'L', 'A']
+          },
+          {
+            name: 'Countries',
+            words: ['sPaiN', 'ItaLy', 'chiNa', 'indIA', 'peRu'],
+            letters: ['C', 'I', 'E', 'S', 'T', 'P', 'A', 'A', 'U', 'A', 'I', 'H', 'I', 'D', 'Y', 'N']
+          }
         ],
+        words: [],
+        grid1Characters: [],
+        grid2Characters: [],
         clickOrder: [],
         rowCompleted: [0, 0, 0, 0, 0],
         lastClickedCell: null
@@ -243,7 +263,7 @@
           const characters = this.grid1Characters.slice(row_start, row_start + 5);
           if (characters.every(char => char !== ' ')) {
             const word = characters.filter(char => char !== '-').join('');
-            if (word.toLowerCase() == words[row].toLowerCase()) {
+            if (word.toLowerCase() == this.words[row].toLowerCase()) {
               this.$set(this.rowCompleted, row, 1);
             } else {
               this.$set(this.rowCompleted, row, -1);
@@ -259,7 +279,37 @@
         isWrong(index) {
           const row = Math.floor(index / 5);
           return this.rowCompleted[row] === -1;
+        },
+        changeTheme() {
+          const selectedThemeData = this.themes.find(theme => theme.name === this.selectedTheme);
+          if (selectedThemeData) {
+            this.words = selectedThemeData.words;
+            const paddedCharacters = selectedThemeData.words
+              .map(word => word.padEnd(5, '-'))
+              .flatMap(word => word.split(''))
+              .map(char => char === char.toUpperCase() ? char.toLowerCase() : ' ');
+
+            if (selectedThemeData.letters.length == 0) {
+              const characters = selectedThemeData.words.join('').split('');
+              const lowercaseCharacters = characters.filter(char => char === char.toLowerCase());
+              const scrambledCharacters = lowercaseCharacters
+                .sort(() => Math.random() - 0.5)
+                .map(char => char.toUpperCase());
+              this.grid2Characters = scrambledCharacters
+              console.log(scrambledCharacters);
+            } else {
+              this.grid2Characters = [...selectedThemeData.letters];
+            }
+
+            this.grid1Characters = paddedCharacters;
+            this.lastClickedCell = null;
+            this.clickOrder = [];
+            this.rowCompleted = [0, 0, 0, 0, 0];
+          }
         }
+      },
+      created() {
+        this.changeTheme();
       }
     });
   </script>
