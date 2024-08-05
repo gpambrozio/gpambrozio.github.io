@@ -165,7 +165,7 @@
                 :class="{ 
                   hidden: char === '-', 
                   empty: char === ' ',
-                  highlighted: lastClickedCell === 'grid1-' + index,
+                  highlighted: lastClickedCell === index,
                   lowercase: char === char.toLowerCase() && char !== char.toUpperCase(),
                   right: isRight(index) && char !== '-',
                   wrong: isWrong(index) && char !== '-'
@@ -270,7 +270,7 @@
             const transferredChar = this.grid2Characters.shift();
             this.clickOrder.push(index);
             this.$set(this.grid1Characters, index, transferredChar);
-            this.lastClickedCell = 'grid1-' + index;
+            this.lastClickedCell = index;
             this.checkRowCompletion(index);
           } else if (this.clickOrder.length > 0) {
             const lastClickIndex = this.clickOrder[this.clickOrder.length - 1];
@@ -281,7 +281,7 @@
               this.grid2Characters.unshift(transferredChar);
               if (this.clickOrder.length > 0) {
                 const lastClickIndex = this.clickOrder[this.clickOrder.length - 1];
-                this.lastClickedCell = 'grid1-' + lastClickIndex;
+                this.lastClickedCell = lastClickIndex;
             } else {
                 this.lastClickedCell = null;
               }
