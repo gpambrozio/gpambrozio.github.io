@@ -40,10 +40,13 @@
     .grid {
       display: grid;
       gap: 5px;
+    }
+    .grid-letters {
       grid-template-columns: repeat(7, 1fr);
     }
     .grid-puzzle {
       grid-template-rows: repeat(5, 1fr);
+      grid-template-columns: repeat(10, 1fr);
       row-gap: 15px;
     }
     .cell {
@@ -123,10 +126,11 @@
         justify-content: center;
         gap: 40px;
       }
-      .grid {
-        grid-template-columns: repeat(8, 80px);
+      .grid-letters {
+        grid-template-columns: repeat(7, 80px);
       }
       .grid-puzzle {
+        grid-template-columns: repeat(10, 80px);
         grid-template-rows: repeat(5, 80px);
       }
       .cell {
@@ -174,7 +178,7 @@
           </div>
           <div>
             <div class="grid-label">Queue</div>
-            <div class="grid">
+            <div class="grid grid-letters">
               <div 
                 v-for="(char, index) in grid2Characters" 
                 :key="'grid2-' + index" 
@@ -256,9 +260,9 @@
           }
         },
         checkRowCompletion(index) {
-          const row = Math.floor(index / 8);
-          const row_start = row * 8;
-          const characters = this.grid1Characters.slice(row_start, row_start + 8);
+          const row = Math.floor(index / 10);
+          const row_start = row * 10;
+          const characters = this.grid1Characters.slice(row_start, row_start + 10);
           if (characters.every(char => char !== ' ')) {
             const word = characters.filter(char => char !== '-').join('');
             if (word.toLowerCase() == this.words[row].toLowerCase()) {
@@ -271,11 +275,11 @@
           }
         },
         isRight(index) {
-          const row = Math.floor(index / 8);
+          const row = Math.floor(index / 10);
           return this.rowCompleted[row] === 1;
         },
         isWrong(index) {
-          const row = Math.floor(index / 8);
+          const row = Math.floor(index / 10);
           return this.rowCompleted[row] === -1;
         },
         changeTheme() {
@@ -283,7 +287,7 @@
           if (selectedThemeData) {
             this.words = selectedThemeData.words;
             const paddedCharacters = selectedThemeData.words
-              .map(word => word.padEnd(8, '-'))
+              .map(word => word.padEnd(10, '-'))
               .flatMap(word => word.split(''))
               .map(char => char === char.toUpperCase() ? char.toLowerCase() : ' ');
 
