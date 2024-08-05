@@ -58,8 +58,8 @@
     .cell.clickable {
       cursor: pointer;
     }
-    .black {
-      background-color: black;
+    .cell.hidden {
+      visibility: hidden;
     }
     .empty {
       background-color: #f0f0f0;
@@ -159,7 +159,7 @@
                 :key="'grid1-' + index" 
                 class="cell clickable" 
                 :class="{ 
-                  black: char === '-', 
+                  hidden: char === '-', 
                   empty: char === ' ',
                   highlighted: lastClickedCell === 'grid1-' + index,
                   lowercase: char === char.toLowerCase() && char !== char.toUpperCase(),
@@ -180,8 +180,6 @@
                 :key="'grid2-' + index" 
                 class="cell" 
                 :class="{ 
-                  black: char === '-', 
-                  empty: char === ' ',
                   highlighted: index === 0
                 }"
               >
